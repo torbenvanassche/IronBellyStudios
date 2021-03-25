@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 using Utilities;
 
@@ -45,23 +44,28 @@ public class PoolController : Singleton<PoolController>
             return;
         }
 
-        if (amount > _pooledDictionary[id].Count)
+        //if there are not enough objects in the pool, increase the pool
+        if (amount > _pooledDictionary[id].Count) IncreasePool(id, amount - _pooledDictionary[id].Count);
+
+        //set all inactive
+        foreach (var o in _pooledDictionary[id])
         {
-            IncreasePool(id, amount - _pooledDictionary[id].Count);
+            o.SetActive(false);
         }
-        
+
         for (var i = 0; i < amount; i++)
         {
             //Grab an object from the collection
             var gameObjectToSpawn = _pooledDictionary[id].Dequeue();
-        
-            //activate the object
+            
+            //active where relevant
             gameObjectToSpawn.SetActive(true);
 
             //Get the interface connected to the "spawned" object and call the "Start" function
             gameObjectToSpawn.GetComponent<IPooledObject>()?.OnSpawn();
 
             //add the object back into the pool (first in, first out)
+            //this allows the greatest degree of flexibility for objects not to de-spawn onscreen
             _pooledDictionary[id].Enqueue(gameObjectToSpawn);  
         }
     }
@@ -82,10 +86,5 @@ public class PoolController : Singleton<PoolController>
             
             _pooledDictionary[id].Enqueue(gO);
         }
-    }
-
-    public void IncreasePoolTest(int amount)
-    {
-        IncreasePool("Cube", amount);
     }
 }

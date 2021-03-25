@@ -11,12 +11,9 @@ public class Spawner : MonoBehaviour
     [SerializeField] private TextMeshProUGUI uiCounter;
 
     //Could error if the PoolController Start has not been called (fix with script execution order in unity)
-    //Alternatively WaitUntil and using a coroutine
+    //Alternatively WaitUntil and using a coroutine on the Start method
     private void Start()
     {
-        var maxCount = PoolController.Instance.GetPool(id).Count;
-        if (initialAmount > maxCount) initialAmount = maxCount;
-        
         PoolController.Instance.SpawnFromPool(id, initialAmount);
         
         //Initialize UI
@@ -34,7 +31,6 @@ public class Spawner : MonoBehaviour
 
     public void UpdateUI()
     {
-        //update UI
         if (uiCounter)
         {
             var pool = PoolController.Instance.GetPool(id);

@@ -6,7 +6,7 @@ public class FindNearestNeighbour : MonoBehaviour
     private Transform Find()
     {
         return PoolController.Instance.GetPool("Cube")
-            .Where(o => o.GetComponent<FindNearestNeighbour>())
+            .Where(o => o.GetComponent<FindNearestNeighbour>() && o.activeSelf)
             .OrderBy(t => (t.transform.position - transform.position).sqrMagnitude)
             .First(neighbour => neighbour.transform != transform).transform;
     }
