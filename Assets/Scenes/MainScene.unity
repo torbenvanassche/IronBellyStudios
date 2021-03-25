@@ -391,8 +391,7 @@ MonoBehaviour:
   pools:
   - id: Cube
     prefab: {fileID: 555277823193036801, guid: 115846e855f0ee146b3a60af61aca8c4, type: 3}
-    size: 50
-  uiCounter: {fileID: 2036634391}
+    size: 2
 --- !u!4 &555863834
 Transform:
   m_ObjectHideFlags: 0
@@ -420,7 +419,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: Cube
-  initialAmount: 10
+  initialAmount: 5
+  uiCounter: {fileID: 2036634391}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

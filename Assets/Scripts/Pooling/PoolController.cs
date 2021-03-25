@@ -16,46 +16,44 @@ public class PoolController : Singleton<PoolController>
     
     [SerializeField] private List<Pool> pools;
     
-    //this could be made private, but I want access to the Queue to avoid a FindObjectsOfType<FindNearestNeighbour>() call.
-    public Dictionary<string, Queue<GameObject>> PooledDictionary;
-    
-    //Show in UI
-    [SerializeField] private TextMeshProUGUI uiCounter;
+    private Dictionary<string, Queue<GameObject>> _pooledDictionary;
 
     public void Start()
     {
-        PooledDictionary = new Dictionary<string, Queue<GameObject>>();
+        _pooledDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (var pool in pools)
         {
             Queue<GameObject> objectPool = new Queue<GameObject>();
 
-            for (int i = 0; i < pool.size; i++)
+            for (var i = 0; i < pool.size; i++)
             {
                 var gO = Instantiate(pool.prefab);
                 gO.SetActive(false);
                 objectPool.Enqueue(gO);
             }
             
-            PooledDictionary.Add(pool.id, objectPool);
+            _pooledDictionary.Add(pool.id, objectPool);
         }
-
-        //Grab the cube instance counter and display in the UI
-        uiCounter.text = $"0 / {PooledDictionary["Cube"].Count}";
     }
 
     public void SpawnFromPool(string id, int amount)
     {
-        if (id == string.Empty || !PooledDictionary.ContainsKey(id))
+        if (id == string.Empty || !_pooledDictionary.ContainsKey(id))
         {
             Debug.LogWarning($"The tag {id} was not found in the dictionary.");
             return;
         }
 
+        if (amount > _pooledDictionary[id].Count)
+        {
+            IncreasePool(id, amount - _pooledDictionary[id].Count);
+        }
+        
         for (var i = 0; i < amount; i++)
         {
             //Grab an object from the collection
-            var gameObjectToSpawn = PooledDictionary[id].Dequeue();
+            var gameObjectToSpawn = _pooledDictionary[id].Dequeue();
         
             //activate the object
             gameObjectToSpawn.SetActive(true);
@@ -63,14 +61,31 @@ public class PoolController : Singleton<PoolController>
             //Get the interface connected to the "spawned" object and call the "Start" function
             gameObjectToSpawn.GetComponent<IPooledObject>()?.OnSpawn();
 
-            //add the object back into the pool (FI-FO principle)
-            PooledDictionary[id].Enqueue(gameObjectToSpawn);  
+            //add the object back into the pool (first in, first out)
+            _pooledDictionary[id].Enqueue(gameObjectToSpawn);  
         }
+    }
 
-        //update GUI
-        if (uiCounter && PooledDictionary.ContainsKey("Cube"))
+    public Queue<GameObject> GetPool(string id)
+    {
+        return _pooledDictionary.TryGetValue(id, out var q) ? q : null;
+    }
+
+    private void IncreasePool(string id, int amount)
+    {
+        for (var i = 0; i < amount; i++)
         {
-            uiCounter.text = $"{PooledDictionary["Cube"].Count(o => o.activeSelf)} / {PooledDictionary["Cube"].Count}";   
+            //Instantiate and queue a copy of an existing element in the queue
+            var prefab = pools.First(pool => pool.id == id).prefab;
+            var gO = Instantiate(prefab);
+            gO.SetActive(false);
+            
+            _pooledDictionary[id].Enqueue(gO);
         }
+    }
+
+    public void IncreasePoolTest(int amount)
+    {
+        IncreasePool("Cube", amount);
     }
 }
