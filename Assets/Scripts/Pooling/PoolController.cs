@@ -79,8 +79,14 @@ public class PoolController : Singleton<PoolController>
     {
         for (var i = 0; i < amount; i++)
         {
-            //Instantiate and queue a copy of an existing element in the queue
+            //Find correct pooled prefab
             var prefab = pools.First(pool => pool.id == id).prefab;
+
+            //foreach (var pool in pools)
+            //{
+            //    if (pool.id == id) prefab = pool.prefab;
+            //}
+            
             var gO = Instantiate(prefab);
             gO.SetActive(false);
             

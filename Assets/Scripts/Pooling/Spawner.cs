@@ -34,6 +34,14 @@ public class Spawner : MonoBehaviour
         if (uiCounter)
         {
             var pool = PoolController.Instance.GetPool(id);
+
+            //Alternative to LINQ
+            //var activeCount = 0;
+            //foreach (var o in pool)
+            //{
+            //    if (o.activeSelf) activeCount++;
+            //}
+            
             uiCounter.text = $"{pool.Count(o => o.activeSelf)} / {pool.Count}";   
         }
     }
