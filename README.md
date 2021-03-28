@@ -1,5 +1,5 @@
 # Pooling system
-Using a `Queue` I can easily make sure that the object I take from the pool is the oldest, this makers it lesl likely the object is on screen.
+Using a `Queue` I can easily make sure that the object I take from the pool is the oldest, this makes it less likely the object is on screen.
 The `ObjectPooler` holds all the different item pools (this is a Singleton). The `Spawner`can be placed on any object and will pull from the pool.
 Multiple pools are disallowed by the singleton, but multiple spawners can pull from the same pool. 
 If the initial amount exceeds the size of the pool it will be increased dynamically (startup & runtime)
